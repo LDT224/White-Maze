@@ -52,9 +52,51 @@ window.onload = () => {
     }
   }
 
+  current = grid[0];
+  current.visited = true;
+
   app.on("update", (dt) => {
-    for(let i = 0; i < grid.length; i++){
-      grid[i].showWall();
+
+    // 1. Choose the next cell
+    let next = current.checkNeighbors(grid, col, row);
+    if (next) {
+      next.visited = true; // Mark the next cell as visited
+      
+      // 2. Push the current cell to the stack
+      stack.push(current);
+      
+      // 3. Remove the walls between the current cell and the chosen cell
+      removeWalls(current, next);
+      
+      // 4. Move to the next cell
+      current = next;
+    } else if (stack.length > 0) {
+      // 5. Backtrack if no unvisited neighbors are found
+      current = stack.pop()!;
+    } else if(!next && stack.length == 0){
+      for(let i =0; i < grid.length; i++){
+        grid[i].showWall();
+      }
     }
+
   });
+
+  function removeWalls(a: Cell, b: Cell): void {
+    let x = a.i - b.i;
+    if (x === 1) {
+      a.walls[3] = false; // Left wall of 'a'
+      b.walls[2] = false; // Right wall of 'b'
+    } else if (x === -1) {
+      a.walls[2] = false; // Right wall of 'a'
+      b.walls[3] = false; // Left wall of 'b'
+    }
+    let y = a.j - b.j;
+    if (y === 1) {
+      a.walls[0] = false; // Top wall of 'a'
+      b.walls[1] = false; // Bottom wall of 'b'
+    } else if (y === -1) {
+      a.walls[1] = false; // Bottom wall of 'a'
+      b.walls[0] = false; // Top wall of 'b'
+    }
+  }
 };
