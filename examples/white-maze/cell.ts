@@ -3,23 +3,36 @@ import * as pc from "playcanvas";
 export class Cell {
   private cell: pc.Entity;
   public walls = [true, true, true, true];
-  public visited = false; // Set to public to be accessible in the checkNeighbors function
+  public visited = false; 
   public i: number;
   public j: number;
   private app: pc.Application;
   
   constructor(i: number, j: number, app: pc.Application) {
-    this.i = i; // Store i and j for indexing
+    this.i = i; 
     this.j = j;
     this.app = app;
     
-    this.cell = new pc.Entity();
+    var material = new pc.StandardMaterial();
 
+    material.diffuse.set(204 / 255, 204 / 255, 204 / 255);
+
+    material.update();
+
+    this.cell = new pc.Entity();
     this.cell.addComponent("model", {
-      type: "plane"
+        type: "plane"
     });
+
+    if (this.cell.model && this.cell.model.meshInstances.length > 0) {
+      this.cell.model.meshInstances[0].material = material;
+  } else {
+      console.error("Model or meshInstances not initialized properly.");
+  }
+
     this.cell.setLocalScale(1, 1, 1);
-    this.cell.setLocalPosition(i, 0, j);
+    this.cell.setLocalPosition(this.i, 0, this.j);
+
 
     app.root.addChild(this.cell);
   }
@@ -30,7 +43,7 @@ export class Cell {
       type: "box"
     });
     box.setLocalPosition(x, y, z);
-    box.setLocalScale(0.02, 1, 1);
+    box.setLocalScale(0.05, 1, 1);
     
     if (rotation) {
         box.rotate(0, rotation, 0);

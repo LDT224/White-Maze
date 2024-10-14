@@ -1,5 +1,6 @@
 import * as pc from "playcanvas";
 import { Cell } from './cell';
+import { Teleport } from "./teleport";
 
 window.onload = () => {
 
@@ -51,12 +52,12 @@ window.onload = () => {
       grid.push(cell);
     }
   }
+  var teleport = new Teleport(grid[0],grid[grid.length-1],app);
 
   current = grid[0];
   current.visited = true;
 
-  app.on("update", (dt) => {
-
+  for(let i = 0; i < grid.length; i++ ){
     // 1. Choose the next cell
     let next = current.checkNeighbors(grid, col, row);
     if (next) {
@@ -64,21 +65,25 @@ window.onload = () => {
       
       // 2. Push the current cell to the stack
       stack.push(current);
-      
+        
       // 3. Remove the walls between the current cell and the chosen cell
       removeWalls(current, next);
-      
+        
       // 4. Move to the next cell
       current = next;
-    } else if (stack.length > 0) {
+      
       // 5. Backtrack if no unvisited neighbors are found
+    } else if (stack.length > 0) {
       current = stack.pop()!;
+      i--;      
     } else if(!next && stack.length == 0){
       for(let i =0; i < grid.length; i++){
         grid[i].showWall();
       }
     }
 
+  }
+  app.on("update", (dt) => {
   });
 
   function removeWalls(a: Cell, b: Cell): void {
