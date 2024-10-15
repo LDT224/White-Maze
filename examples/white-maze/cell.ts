@@ -33,6 +33,17 @@ export class Cell {
     this.cell.setLocalScale(1, 1, 1);
     this.cell.setLocalPosition(this.i, 0, this.j);
 
+    // Add a rigidbody component so that other objects collide with it
+    this.cell.addComponent('rigidbody', {
+      type: "static",
+      restitution: 0.5
+    });
+
+    // Add a collision component
+    this.cell.addComponent('collision', {
+        type: "box",
+        halfExtents: new pc.Vec3(0.5, 0.001, 0.5)
+    });
 
     app.root.addChild(this.cell);
   }
@@ -48,6 +59,18 @@ export class Cell {
     if (rotation) {
         box.rotate(0, rotation, 0);
     }
+
+    // Add a rigidbody component so that other objects collide with it
+    box.addComponent('rigidbody', {
+      type: "static",
+      restitution: 0.5
+    });
+
+    // Add a collision component
+    box.addComponent('collision', {
+        type: "box",
+        halfExtents: new pc.Vec3(0.025, 0.5, 0.5)
+    });
 
     this.cell.addChild(box);
   }

@@ -43,7 +43,8 @@ window.onload = () => {
   app.setCanvasResolution(pc.RESOLUTION_AUTO);
   window.addEventListener("resize", () => app.resizeCanvas());
   
-  
+  // Set the gravity for our rigid bodies
+  app.systems.rigidbody?.gravity.set(0,-9.81,0);
   
   // ==================================CREATE AND ADD CELLS========================
   for (let j = 0; j < row; j++) {
