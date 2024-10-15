@@ -1,6 +1,7 @@
 import * as pc from "playcanvas";
 import { Cell } from './cell';
 import { Teleport } from "./teleport";
+import { Character } from "./character";
 
 window.onload = () => {
 
@@ -58,35 +59,36 @@ window.onload = () => {
   current = grid[0];
   current.visited = true;
 
-  for(let i = 0; i < grid.length; i++ ){
-    // 1. Choose the next cell
-    let next = current.checkNeighbors(grid, col, row);
-    if (next) {
-      next.visited = true; // Mark the next cell as visited
-      
-      // 2. Push the current cell to the stack
-      stack.push(current);
+  //Gen Map
+  function genMap(){
+    for(let i = 0; i < grid.length; i++ ){
+      // 1. Choose the next cell
+      let next = current.checkNeighbors(grid, col, row);
+      if (next) {
+        next.visited = true; // Mark the next cell as visited
         
-      // 3. Remove the walls between the current cell and the chosen cell
-      removeWalls(current, next);
+        // 2. Push the current cell to the stack
+        stack.push(current);
+          
+        // 3. Remove the walls between the current cell and the chosen cell
+        removeWalls(current, next);
+          
+        // 4. Move to the next cell
+        current = next;
         
-      // 4. Move to the next cell
-      current = next;
-      
-      // 5. Backtrack if no unvisited neighbors are found
-    } else if (stack.length > 0) {
-      current = stack.pop()!;
-      i--;      
-    } else if(!next && stack.length == 0){
-      for(let i =0; i < grid.length; i++){
-        grid[i].showWall();
+        // 5. Backtrack if no unvisited neighbors are found
+      } else if (stack.length > 0) {
+        current = stack.pop()!;
+        i--;      
+      } else if(!next && stack.length == 0){
+        for(let i =0; i < grid.length; i++){
+          grid[i].showWall();
+        }
       }
+      console.log("AAAA")
     }
-
   }
-  app.on("update", (dt) => {
-  });
-
+  
   function removeWalls(a: Cell, b: Cell): void {
     let x = a.i - b.i;
     if (x === 1) {
@@ -105,4 +107,26 @@ window.onload = () => {
       b.walls[0] = false; // Top wall of 'b'
     }
   }
+
+  // ===============================CREATE AND ADD CHARACTER========================
+  const assets = {
+    charModelAsset: new pc.Asset("model_purus_girl", "model", { url: "../../assets/models/model_purus_girl.glb" }),
+    charTextureAsset: new pc.Asset("tex_purus_girl", "texture", { url: "../../assets/textures/tex_purus_girl.jpg" }),
+    charIdleAnimationAsset: new pc.Asset("anim_purus_girl_idle", "animation", { url: "../../assets/animations/anim_purus_girl_idle.glb" }),
+    charRunAnimationAsset: new pc.Asset("anim_purus_girl_run", "animation", { url: "../../assets/animations/anim_purus_girl_run.glb" }),
+  };
+
+  const assetListLoader = new pc.AssetListLoader(Object.values(assets), app.assets);
+  assetListLoader.load(() => {
+    const character = new Character(app, assets);
+
+    const charMovement = new pc.Vec3();
+    const charSpeed = 3;
+    const keyboard = new pc.Keyboard(document.body);
+    genMap();
+    app.on("update", (dt) => {
+      character.updateMovement(charMovement, keyboard, charSpeed, dt);      
+    });
+  });
+
 };

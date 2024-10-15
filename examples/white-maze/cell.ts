@@ -50,9 +50,21 @@ export class Cell {
 
   private createWall(x: number, y: number, z: number, rotation: number = 0): void {
     const box = new pc.Entity();
+    var wallMaterial = new pc.StandardMaterial();
+
+    wallMaterial.diffuse.set(1, 1, 1);
+
+    wallMaterial.update();
     box.addComponent("model", {
       type: "box"
     });
+
+    if (box.model && box.model.meshInstances.length > 0) {
+      box.model.meshInstances[0].material = wallMaterial;
+    } else {
+        console.error("Model or meshInstances not initialized properly.");
+    }
+
     box.setLocalPosition(x, y, z);
     box.setLocalScale(0.05, 1, 1);
     
