@@ -75,7 +75,7 @@ export class Cell {
     // Add a rigidbody component so that other objects collide with it
     box.addComponent('rigidbody', {
       type: "static",
-      restitution: 0.5
+      restitution: 0
     });
 
     // Add a collision component

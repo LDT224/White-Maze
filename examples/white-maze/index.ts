@@ -85,7 +85,6 @@ window.onload = () => {
           grid[i].showWall();
         }
       }
-      console.log("AAAA")
     }
   }
   

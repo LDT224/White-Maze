@@ -35,11 +35,11 @@ export class Teleport{
         this.startTeleport.setLocalScale(0.5, 0.1, 0.5);
         this.startTeleport.setLocalPosition(this.startCell.i, 0, this.startCell.j);
 
-        // Add a rigidbody component so that other objects collide with it
-        this.startTeleport.addComponent('rigidbody', {
-            type: "static",
-            restitution: 0.5
-        });
+        // // Add a rigidbody component so that other objects collide with it
+        // this.startTeleport.addComponent('rigidbody', {
+        //     type: "static",
+        //     restitution: 0.5
+        // });
 
         // Add a collision component
         this.startTeleport.addComponent('collision', {

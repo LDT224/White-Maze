@@ -17,7 +17,7 @@ export class Character {
       asset: assets.charModelAsset
     });
 
-    const scale = 0.01;
+    const scale = 0.005;
     this.entity.setLocalScale(scale, scale, scale);
 
     this.entity.addComponent("animation", {
@@ -25,40 +25,63 @@ export class Character {
     });
     this.currentAnim = assets.charIdleAnimationAsset.name;
 
+    // Add rigid body component (dynamic for movement)
+    this.entity.addComponent("rigidbody", {
+      type: "dynamic",
+      mass: 1,
+      linearDamping: 0.99, // Prevent excessive sliding
+      angularDamping: 0.99, // Prevent spinning out
+    });
+
+    // Add collision component (for interactions with the world)
+    this.entity.addComponent("collision", {
+      type: "box",
+      halfExtents: new pc.Vec3(scale/2, scale/2, scale/2), // Adjust based on character model
+    });
+
     const material = this.entity.model?.meshInstances[0].material as pc.StandardMaterial;
     material.diffuseMap = assets.charTextureAsset.resource;
   }
 
   updateMovement(charMovement: pc.Vec3, keyboard: pc.Keyboard, charSpeed: number, dt: number) {
+    const force = new pc.Vec3();
+    
+    // Move forward with W
     if (keyboard.isPressed(pc.KEY_W)) {
-      charMovement.z -= charSpeed * dt;
+        const forward = this.entity.forward.clone().normalize();  
+        force.add(forward.mulScalar(charSpeed * 100));  
     }
-    if (keyboard.isPressed(pc.KEY_S)) {
-      charMovement.z += charSpeed * dt;
+
+    // If there's any force, apply it to the character
+    if (force.length() > 0) {
+        this.entity.rigidbody?.applyForce(force);
+        console.log('Force applied: ', force);  
     }
+
+    // Rotate left with A
     if (keyboard.isPressed(pc.KEY_A)) {
-      charMovement.x -= charSpeed * dt;
+      const rotationSpeed = 90; 
+      this.entity.rotate(0, -rotationSpeed * dt, 0);
     }
+
+    // Rotate right with D
     if (keyboard.isPressed(pc.KEY_D)) {
-      charMovement.x += charSpeed * dt;
+        const rotationSpeed = 90; 
+        this.entity.rotate(0, rotationSpeed * dt, 0);
     }
 
-    this.entity.translate(charMovement);
+    // Reset the movement vector
+    charMovement.set(0, 0, 0)
 
-    if (charMovement.length() > 0) {
-      const angle = Math.atan2(charMovement.x, charMovement.z);
-      this.entity.setEulerAngles(0, angle * pc.math.RAD_TO_DEG, 0);
-    }
-    charMovement.set(0, 0, 0);
-
-    const moved = keyboard.isPressed(pc.KEY_W) || keyboard.isPressed(pc.KEY_S) || keyboard.isPressed(pc.KEY_A) || keyboard.isPressed(pc.KEY_D);
+    // Switch between run and idle animations
+    const moved = keyboard.isPressed(pc.KEY_W);
     if (moved && this.currentAnim === this.assets.charIdleAnimationAsset.name) {
-      this.entity.animation?.play(this.assets.charRunAnimationAsset.name, 0.1);
-      this.currentAnim = this.assets.charRunAnimationAsset.name;
-    }
-    else if (!moved && this.currentAnim === this.assets.charRunAnimationAsset.name) {
-      this.entity.animation?.play(this.assets.charIdleAnimationAsset.name, 0.1);
-      this.currentAnim = this.assets.charIdleAnimationAsset.name;
+        this.entity.animation?.play(this.assets.charRunAnimationAsset.name, 0.1);
+        this.currentAnim = this.assets.charRunAnimationAsset.name;
+    } else if (!moved && this.currentAnim === this.assets.charRunAnimationAsset.name) {
+        this.entity.animation?.play(this.assets.charIdleAnimationAsset.name, 0.1);
+        this.currentAnim = this.assets.charIdleAnimationAsset.name;
     }
   }
+
 }
