@@ -2,6 +2,7 @@ import * as pc from "playcanvas";
 import { Cell } from './cell';
 import { Teleport } from "./teleport";
 import { Character } from "./character";
+import { UIMenu } from './UIMenu';
 
 window.onload = () => {
     let row = 10;
@@ -11,15 +12,16 @@ window.onload = () => {
     let current: Cell; 
     let mainCameraEntity: pc.Entity;
     let thirdPersonCameraEntity: pc.Entity;
-
     // ==============================CREATE APPLICATION==============================
     const canvas: HTMLCanvasElement = document.createElement("canvas");
     canvas.width = 600;
     canvas.height = 300;
     document.body.appendChild(canvas);
-
+    
     const app = new pc.Application(canvas);
     app.start();
+    
+    const uiMenu = new UIMenu(app);
 
     // ==================================ADD MAIN CAMERA=================================
     mainCameraEntity = new pc.Entity("MainCamera");
@@ -124,8 +126,15 @@ window.onload = () => {
         genMap();
         
         app.on("update", (dt) => {
-            character.updateMovement(charMovement, keyboard, charSpeed, dt);
-            
+
+            if (!uiMenu.gameStarted) {
+                return; 
+            }
+
+            if (!mainCameraEntity.enabled) {
+                character.updateMovement(charMovement, keyboard, charSpeed, dt);
+                }  
+                
             // Update third-person camera position behind the character
             const charPos = character.entity.getPosition();
             charPos.y += 0.5;
@@ -134,10 +143,10 @@ window.onload = () => {
             const cameraHeight = 0.5; 
 
             thirdPersonCameraEntity.setPosition(
-              charPos.x - charForward.x * cameraDistance,
-              charPos.y + cameraHeight,
-              charPos.z - charForward.z * cameraDistance
-          );
+                charPos.x - charForward.x * cameraDistance,
+                charPos.y + cameraHeight,
+                charPos.z - charForward.z * cameraDistance
+            );
 
             thirdPersonCameraEntity.lookAt(charPos);
 
