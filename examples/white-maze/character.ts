@@ -61,13 +61,13 @@ export class Character {
     // Rotate left with A
     if (keyboard.isPressed(pc.KEY_A)) {
       const rotationSpeed = 90; 
-      this.entity.rotate(0, -rotationSpeed * dt, 0);
+      this.entity.rotate(0, rotationSpeed * dt, 0);
     }
 
     // Rotate right with D
     if (keyboard.isPressed(pc.KEY_D)) {
         const rotationSpeed = 90; 
-        this.entity.rotate(0, rotationSpeed * dt, 0);
+        this.entity.rotate(0, -rotationSpeed * dt, 0);
     }
 
     // Reset the movement vector
